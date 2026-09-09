@@ -45,14 +45,16 @@ POSITION_NIVEAU = POSITION_SCORE[0], 240
 
 PIECES = {
 	'O': [
-		'0000\n0110\n0110\n0000',
+		'0000\n0110\n0110\n0000', #^ Piece Carré
+								  #! Pas de deuxieme ligne 
+								  #! le carré ne tourne pas
 	],
 	'S': [
-		'0000\n0022\n0220\n0000',
+		'0000\n0022\n0220\n0000', #! La pièce en S
 		'0000\n0200\n0220\n0020',
 	],
 	'Z': [
-		'0000\n3300\n0330\n0000',
+		'0000\n3300\n0330\n0000', #& La piece en Z
 		'0000\n0030\n0330\n0300',
 	],
 	'I': [
