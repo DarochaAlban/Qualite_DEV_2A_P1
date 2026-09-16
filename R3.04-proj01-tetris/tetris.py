@@ -16,13 +16,13 @@ __maintainer__ = "votre nom"
 __email__ = "votre email"
 
 # Probleme de l'ordre des imports
-from pygame.locals import *
+import pygame
 import random
 import time
-import pygame
 import sys
-
 import constantes
+
+from pygame.locals import *
 from constantes import *
 
 # Classe Tetris
