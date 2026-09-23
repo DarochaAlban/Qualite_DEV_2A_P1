@@ -81,7 +81,7 @@ class Jeu:
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				self._quitter()
-			if event.type == KEYUP:
+			if event.type == KEYUP:  #! on attend que la touche echap soit appuyée puis "désappuyée" pour quitter
 				if event.key == K_ESCAPE:
 					self._quitter()
 			if event.type == KEYDOWN:
