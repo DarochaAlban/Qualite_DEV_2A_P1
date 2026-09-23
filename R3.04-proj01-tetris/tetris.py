@@ -43,36 +43,44 @@ POSITION_LIGNES = POSITION_SCORE[0], 180
 POSITION_TETRIS = POSITION_SCORE[0], 210
 POSITION_NIVEAU = POSITION_SCORE[0], 240
 
+#^ Les pièces sont représentée dans des
+#^ liste de grilles 4x4 représentant leur formes et rotations
+#^ Il faudra retoucher ces listes pour mieux comprendre et
+#^ aérer entre les différentes rotations.
+
+
 PIECES = {
 	'O': [
-		'0000\n0110\n0110\n0000',
+		'0000\n0110\n0110\n0000', #^ Piece Carré
+								  #! Pas de deuxieme ligne 
+								  #! le carré ne tourne pas
 	],
 	'S': [
-		'0000\n0022\n0220\n0000',
+		'0000\n0022\n0220\n0000', #! La pièce en S
 		'0000\n0200\n0220\n0020',
 	],
 	'Z': [
-		'0000\n3300\n0330\n0000',
+		'0000\n3300\n0330\n0000', #& La pièce en S à l'envers
 		'0000\n0030\n0330\n0300',
 	],
 	'I': [
-		'0400\n0400\n0400\n0400',
+		'0400\n0400\n0400\n0400', #? Le baton
 		'0000\n4444\n0000\n0000',
 	],
 	'J': [
-		'0000\n5000\n5550\n0000',
+		'0000\n5000\n5550\n0000', #^ La pièce L retournée
 		'0000\n0550\n0500\n0500',
 		'0000\n0000\n5550\n0050',
 		'0000\n0050\n0050\n0550',
 	],
 	'L': [
-		'0000\n0060\n6660\n0000',
+		'0000\n0060\n6660\n0000', #! La pièce L
 		'0000\n0060\n0060\n0660',
 		'0000\n0000\n6660\n6000',
 		'0000\n0660\n0060\n0060',
 	],
 	'T': [
-		'0000\n0700\n7770\n0000',
+		'0000\n0700\n7770\n0000', #* La piece T
 		'0000\n0700\n0770\n0700',
 		'0000\n0000\n7770\n0700',
 		'0000\n0070\n0770\n0070',
@@ -81,17 +89,19 @@ PIECES = {
 for name, rotations in PIECES.items():
 	PIECES[name] = [[[int(i) for i in p] for p in r.splitlines()] for r in rotations]
 
+#! Les couleurs en RGB
+
 COULEURS = {
-	0: (0, 0, 0),
-	1: (255, 255, 0),
-	2: (0, 255, 0),
-	3: (255, 0, 0),
-	4: (0, 255, 255),
-	5: (0, 0, 255),
-	6: (255, 127, 0),
-	7: (255, 0, 255),
-	8: (127, 255, 0),
-	9: (255, 255, 255),
+	0: (0, 0, 0),	#Noir
+	1: (255, 255, 0),	#^ Jaune
+	2: (0, 255, 0),		#* Vert
+	3: (255, 0, 0),		#! Rouge
+	4: (0, 255, 255),	#? Cyan
+	5: (0, 0, 255),		#? Bleu
+	6: (255, 127, 0),	#! Orange
+	7: (255, 0, 255),	#Violet
+	8: (127, 255, 0),	#* Vert Chartreuse
+	9: (255, 255, 255), #Blanc
 }
 
 PIECES_KEYS = list(PIECES.keys())
@@ -129,11 +139,11 @@ class Jeu:
 		rect = rendu.get_rect()
 		rect.center = position
 		self.surface.blit(rendu, rect)
-	def _getEvent(self):
+	def _getEvent(self): 
 		for event in pygame.event.get():
 			if event.type == QUIT:
 				self._quitter()
-			if event.type == KEYUP:
+			if event.type == KEYUP:  #! on attend que la touche echap soit appuyée puis "désappuyée" pour quitter
 				if event.key == K_ESCAPE:
 					self._quitter()
 			if event.type == KEYDOWN:
