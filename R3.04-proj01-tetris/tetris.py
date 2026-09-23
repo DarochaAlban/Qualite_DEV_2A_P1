@@ -45,6 +45,12 @@ POSITION_LIGNES = POSITION_SCORE[0], 180
 POSITION_TETRIS = POSITION_SCORE[0], 210
 POSITION_NIVEAU = POSITION_SCORE[0], 240
 
+#^ Les pièces sont représentée dans des
+#^ liste de grilles 4x4 représentant leur formes et rotations
+#^ Il faudra retoucher ces listes pour mieux comprendre et
+#^ aérer entre les différentes rotations.
+
+
 PIECES = {
     'O': [
         '0000\n0110\n0110\n0000', 
@@ -85,6 +91,8 @@ PIECES = {
 for name, rotations in PIECES.items():
     PIECES[name] = [[[int(i) for i in p] for p in r.splitlines()]
                     for r in rotations]
+
+#! Les couleurs en RGB
 
 COULEURS = {
     0: (0, 0, 0),
