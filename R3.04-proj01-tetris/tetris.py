@@ -88,289 +88,154 @@ PIECES_KEYS = list(PIECES.keys())
 
 # Classe Tetris
 class Jeu:
-	"""La classe qui gère le jeu en son intégralité
-	"""
-	def __init__(self):
-		pygame.init()
-		self.clock = pygame.time.Clock()
-		self.surface = pygame.display.set_mode(TAILLE_FENETRE)
-		self.fonts = {
-			'defaut': pygame.font.Font('freesansbold.ttf', 18),
-			'titre': pygame.font.Font('freesansbold.ttf', 100),
-		}
-		pygame.display.set_caption('Application Tetris')
+    """La classe qui gère le jeu en son intégralité
+    """
+    def __init__(self):
+        pygame.init()
+        self.clock = pygame.time.Clock()
+        self.surface = pygame.display.set_mode(TAILLE_FENETRE)
+        self.fonts = {
+            'defaut': pygame.font.Font('freesansbold.ttf', 18),
+            'titre': pygame.font.Font('freesansbold.ttf', 100),
+        }
+        pygame.display.set_caption('Application Tetris')
 
-	def start(self):
-		""" Affiche l'écran de titre du jeu
-		"""
+    def start(self):
+        """ Affiche l'écran de titre du jeu
+        """
 
-		self._afficher_texte('Tetris', CENTRE_FENETRE, font = 'titre')
-		self._afficher_texte('Appuyer sur une touche...', POS)
-		self._attente()
+        self._afficher_texte('Tetris', CENTRE_FENETRE, font = 'titre')
+        self._afficher_texte('Appuyer sur une touche...', POS)
+        self._attente()
 
-	def stop(self):
-		""" L'écran de Game Over
-		"""
-		self._afficher_texte('Perdu', CENTRE_FENETRE, font='titre')
-		self._attente()
-		self._quitter()
+    def stop(self):
+        """ L'écran de Game Over
+        """
+        self._afficher_texte('Perdu', CENTRE_FENETRE, font='titre')
+        self._attente()
+        self._quitter()
 
-	def _afficher_texte(self, text, position, couleur=9, font='defaut'):
-		"""Affiche un texte de couleur à l'écran là ou on le souhaite
+    def _afficher_texte(self, text, position, couleur=9, font='defaut'):
+        """Affiche un texte de couleur à l'écran là ou on le souhaite
 
-		Args:
-			text (str): Le texte à afficher
-			position ( tuple(int,int) ): Les positions X et Y du texte
-			couleur (int, optional): La couleur du texte. 9 (=Blanc) par défaut.
-			font (str, optional): Le nom de la police à utiliser , en utilise une par défaut
-		"""
-#		print("Afficher Texte")
-		font = self.fonts.get(font, self.fonts['defaut'])
-		couleur=COULEURS.get(couleur, COULEURS[9])
-		rendu = font.render(text, True, couleur)
-		rect = rendu.get_rect()
-		rect.center = position
-		self.surface.blit(rendu, rect)
-	def _get_event(self):
-		"""Renvoie la touche appuyée et ferme le jeu si la touche
-			Echap est appuyée ou bien que l'on ferme la fenêtre du jeu
+        Args:
+            text (str): Le texte à afficher
+            position ( tuple(int,int) ): Les positions X et Y du texte
+            couleur (int, optional): La couleur du texte. 9 (=Blanc) par défaut.
+            font (str, optional): Le nom de la police à utiliser , en utilise une par défaut
+        """
+#       print("Afficher Texte")
+        font = self.fonts.get(font, self.fonts['defaut'])
+        couleur=COULEURS.get(couleur, COULEURS[9])
+        rendu = font.render(text, True, couleur)
+        rect = rendu.get_rect()
+        rect.center = position
+        self.surface.blit(rendu, rect)
 
-		Returns:
-			str : le nom de la touche appuyée
-		"""
+    def _get_event(self):
+        """Renvoie la touche appuyée et ferme le jeu si la touche
+            Echap est appuyée ou bien que l'on ferme la fenêtre du jeu
 
-		for event in pygame.event.get():
-			if event.type == QUIT:
-				self._quitter()
-			if event.type == KEYUP:  #! on attend que la touche echap soit appuyée puis "désappuyée" pour quitter
-				if event.key == K_ESCAPE:
-					self._quitter()
-			if event.type == KEYDOWN:
-				if event.key == K_ESCAPE:
-					continue
-				return event.key
-				
-	def _quitter(self):
-		"""Quitte le jeu
-		"""
+        Returns:
+            str : le nom de la touche appuyée
+        """
 
-		print("Quitter")
-		pygame.quit()
-		sys.exit()
-	def _rendre(self):
-		"""Raffraîchit l'écran et incrémente le timer
-		"""
-		pygame.display.update()
-		self.clock.tick()
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                self._quitter()
+            if event.type == KEYUP:  #! on attend que la touche echap soit appuyée puis "désappuyée" pour quitter
+                if event.key == K_ESCAPE:
+                    self._quitter()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    continue
+                return event.key
+                
+    def _quitter(self):
+        """Quitte le jeu
+        """
 
-	def _attente(self):
-		"""Attend jusqu'à qu'une touche soit appuyée
-		"""
-		print("Attente")
-		while self._get_event() == None:
-			self._rendre()
-	def _get_piece(self):
-		return PIECES.get(random.choice(PIECES_KEYS))
-	def _get_current_piece_color(self):
-		for l in self.current[0]:
-			for c in l:
-				if c != 0:
-					return c
-		return 0
-	def _calculer_donnees_piece_courante(self):
-		"""Calcule les coordonnées de la pièce qu'on est en train d'utiliser
-		"""
-		m=self.current[self.position[2]]
-		coords = []
-		for i, l in enumerate(m):
-			for j, k in enumerate(l):
-				if k != 0:
-					coords.append([i+self.position[0], j+self.position[1]])
-		self.coordonnees = coords
-	def _est_valide(self, x=0, y=0, r=0):
-		"""Verifie la position de la pièce dans le tableau
+        print("Quitter")
+        pygame.quit()
+        sys.exit()
 
-		Args:
-			x (int, optional): abscisse de la piece. Defaults to 0.
-			y (int, optional): ordonnée de la piece. Defaults to 0.
-			r (int, optional): rotation de la piece. Defaults to 0.
-		"""
-		if r == 0:
-			coordonnees = self.coordonnees
-		else:
-			m=self.current[(self.position[2]+r)%len(self.current)]
-			coords = []
-			for i, l in enumerate(m):
-				for j, k in enumerate(l):
-					if k != 0:
-						coords.append([i+self.position[0], j+self.position[1]])
-			coordonnees = coords
-#			print("Rotation testée: %s" % coordonnees)
-		for cx, cy in coordonnees:
-			if not 0 <= x + cx < MAX_X:
-#				print("Non valide en X: cx=%s, x=%s" % (cx, x))
-				return False
-			elif cy <0:
-				continue
-			elif y + cy >= MAX_Y:
-#				print("Non valide en Y: cy=%s, y=%s" % (cy, y))
-				return False
-			else:
-				if self.plateau[cy+y][cx+x] != 0:
-#					print("Position occupée sur le plateau")
-					return False
-#		print("Position testée valide: x=%s, y=%s" % (x, y))
-		return True
-	def _poser_piece(self):
-		"""Pose une pièce
-		"""
-		print("La pièce est posée")
-		if self.position[1] <= 0:
-			self.perdu = True
-		# Ajout de la pièce parmi le plateau
-		couleur = self._get_current_piece_color()
-		for cx, cy in self.coordonnees:
-			self.plateau[cy][cx] = couleur
-		completees = []
-		# calculer les lignes complétées
-		for i, line in enumerate(self.plateau[::-1]):
-			for case in line:
-				if case == 0:
-					break
-			else:
-				print(self.plateau)
-				print(">>> %s" % (DIM_PLATEAU[1]-1-i))
-				completees.append(DIM_PLATEAU[1]-1-i)
-		lignes = len(completees)
-		for i in completees:
-			self.plateau.pop(i)
-		for i in range(lignes):
-			self.plateau.insert(0, [0] * DIM_PLATEAU[0])
-		# calculer le score et autre
-		self.lignes += lignes
-		self.score += lignes * self.niveau
-		self.niveau = int(self.lignes / 10) + 1
-		if lignes >= 4:
-			self.tetris +=1
-			self.score += self.niveau * self.tetris
-		# Travail avec la pièce courante terminé
-		self.current = None
-	def _first(self):
-		"""Initialise le jeu
-		"""
-		self.plateau = [[0] * DIM_PLATEAU[0] for i in range(DIM_PLATEAU[1])]
-		self.score, self.pieces, self.lignes, self.tetris, self.niveau = 0, 0, 0, 0, 1
-		self.current, self.next, self.perdu = None, self._get_piece(), False
-	def _next(self):
-		"""Nous fait utiliser la prochaine piece
-		"""
-		print("Piece suivante")
-		self.current, self.next = self.next, self._get_piece()
-		self.pieces += 1
-		self.position = [MILLIEU, -4, 0]
-		self._calculer_donnees_piece_courante()
-		self.dernier_mouvement = self.derniere_chute = time.time()
-	def _gerer_evenements(self):
-		"""Gere les evenements en fonction de la touche appuyée
-			(voir les prints)
-		"""
-		event = self._get_event()
-		if event == K_p:
-			print("Pause")
-			self.surface.fill(COULEURS.get(0))
-			self._afficher_texte('Pause', CENTRE_FENETRE, font='titre')
-			self._afficher_texte('Appuyer sur une touche...', POS)
-			self._attente()
-		elif event == K_LEFT:
-			print("Mouvement vers la gauche")
-			if self._est_valide(x=-1):
-				self.position[0] -= 1
-		elif event == K_RIGHT:
-			print("Mouvement vers la droite")
-			if self._est_valide(x=1):
-				self.position[0] += 1
-		elif event == K_DOWN:
-			print("Mouvement vers le bas")
-			if self._est_valide(y=1):
-				self.position[1] += 1
-		elif event == K_UP:
-			print("Mouvement de rotation")
-			if self._est_valide(r=1):
-				self.position[2] = (self.position[2] + 1) %len(self.current)
-		elif event == K_SPACE:
-			print("Mouvement de chute %s / %s" % (self.position, self.coordonnees))
-			if self.position[1] <=0:
-				self.position[1] = 1
-				self._calculer_donnees_piece_courante()
-			a = 0
-			while self._est_valide(y=a):
-				a+=1
-			self.position[1] += a-1
-		self._calculer_donnees_piece_courante()
-	def _gerer_gravite(self):
-		"""Controle la chute des blocs
-		"""
-		if time.time() - self.derniere_chute > 0.35:
-			self.derniere_chute = time.time()
-			if not self._est_valide():
-				print ("On est dans une position invalide")
-				self.position[1] -= 1
-				self._calculer_donnees_piece_courante()
-				self._poser_piece()
-			elif self._est_valide() and not self._est_valide(y=1):
-				self._calculer_donnees_piece_courante()
-				self._poser_piece()
-			else:
-				print("On déplace vers le bas")
-				self.position[1] += 1
-				self._calculer_donnees_piece_courante()
-	def _dessiner_plateau(self):
-		"""Dessine le plateau du jeu
-		"""
-		self.surface.fill(COULEURS.get(0))
-		pygame.draw.rect(self.surface, COULEURS[8], START_PLABORD+TAILLE_PLABORD, BORDURE_PLATEAU)
-		for i, ligne in enumerate(self.plateau):
-			for j, case in enumerate(ligne):
-				couleur = COULEURS[case]
-				position = j, i
-				coordonnees = tuple([START_PLATEAU[k] + position[k] * TAILLE_BLOC[k] for k in range(2)])
-				pygame.draw.rect(self.surface, couleur, coordonnees + TAILLE_BLOC)
-		if self.current is not None:
-			for position in self.coordonnees:
-				couleur = COULEURS.get(self._get_current_piece_color())
-				coordonnees = tuple([START_PLATEAU[k] + position[k] * TAILLE_BLOC[k] for k in range(2)])
-				pygame.draw.rect(self.surface, couleur, coordonnees + TAILLE_BLOC)
-		self.score, self.pieces, self.lignes, self.tetris, self.niveau#TODO
-		self._afficher_texte('Score: >%s' % self.score, POSITION_SCORE)
-		self._afficher_texte('Pièces: %s' % self.pieces, POSITION_PIECES)
-		self._afficher_texte('Lignes: %s' % self.lignes, POSITION_LIGNES)
-		self._afficher_texte('Tetris: %s' % self.tetris, POSITION_TETRIS)
-		self._afficher_texte('Niveau: %s' % self.niveau, POSITION_NIVEAU)
+    def _rendre(self):
+        """Raffraîchit l'écran et incrémente le timer
+        """
+        pygame.display.update()
+        self.clock.tick()
 
-		self._rendre()
-	def play(self):
-		"""Methode qui tourne si on 
-		    Demarre le jeu depuis l'écran de titre
-			tant qu'on a pas perdu. Le moteur du jeu
-		"""
-		print("Jouer")
-		self.surface.fill(COULEURS.get(0))
-		self._first()
-		while not self.perdu:
-			if self.current is None:
-				self._next()
-			self._gerer_evenements()
-			self._gerer_gravite()
-			self._dessiner_plateau()
+    def _attente(self):
+        """Attend jusqu'à qu'une touche soit appuyée
+        """
+        print("Attente")
+        while self._get_event() == None:
+            self._rendre()
 
-    def _poserPiece(self):
-		"""Pose une piece
-		"""
+    def _get_piece(self):
+        return PIECES.get(random.choice(PIECES_KEYS))
+
+    def _get_current_piece_color(self):
+        for l in self.current[0]:
+            for c in l:
+                if c != 0:
+                    return c
+        return 0
+
+    def _calculer_donnees_piece_courante(self):
+        """Calcule les coordonnées de la pièce qu'on est en train d'utiliser
+        """
+        m=self.current[self.position[2]]
+        coords = []
+        for i, l in enumerate(m):
+            for j, k in enumerate(l):
+                if k != 0:
+                    coords.append([i+self.position[0], j+self.position[1]])
+        self.coordonnees = coords
+
+    def _est_valide(self, x=0, y=0, r=0):
+        """Verifie la position de la pièce dans le tableau
+
+        Args:
+            x (int, optional): abscisse de la piece. Defaults to 0.
+            y (int, optional): ordonnée de la piece. Defaults to 0.
+            r (int, optional): rotation de la piece. Defaults to 0.
+        """
+        if r == 0:
+            coordonnees = self.coordonnees
+        else:
+            m=self.current[(self.position[2]+r)%len(self.current)]
+            coords = []
+            for i, l in enumerate(m):
+                for j, k in enumerate(l):
+                    if k != 0:
+                        coords.append([i+self.position[0], j+self.position[1]])
+            coordonnees = coords
+#           print("Rotation testée: %s" % coordonnees)
+        for cx, cy in coordonnees:
+            if not 0 <= x + cx < MAX_X:
+#               print("Non valide en X: cx=%s, x=%s" % (cx, x))
+                return False
+            elif cy <0:
+                continue
+            elif y + cy >= MAX_Y:
+#               print("Non valide en Y: cy=%s, y=%s" % (cy, y))
+                return False
+            else:
+                if self.plateau[cy+y][cx+x] != 0:
+#                   print("Position occupée sur le plateau")
+                    return False
+#       print("Position testée valide: x=%s, y=%s" % (x, y))
+        return True
+
+    def _poser_piece(self):
+        """Pose une pièce
+        """
         print("La pièce est posée")
         if self.position[1] <= 0:
             self.perdu = True
         # Ajout de la pièce parmi le plateau
-        couleur = self._getCurrentPieceColor()
+        couleur = self._get_current_piece_color()
         for cx, cy in self.coordonnees:
             self.plateau[cy][cx] = couleur
         completees = []
@@ -381,8 +246,8 @@ class Jeu:
                     break
             else:
                 print(self.plateau)
-                print(">>> %s" % (DIM_PLATEAU[1] - 1 - i))
-                completees.append(DIM_PLATEAU[1] - 1 - i)
+                print(">>> %s" % (DIM_PLATEAU[1]-1-i))
+                completees.append(DIM_PLATEAU[1]-1-i)
         lignes = len(completees)
         for i in completees:
             self.plateau.pop(i)
@@ -393,134 +258,128 @@ class Jeu:
         self.score += lignes * self.niveau
         self.niveau = int(self.lignes / 10) + 1
         if lignes >= 4:
-            self.tetris += 1
+            self.tetris +=1
             self.score += self.niveau * self.tetris
         # Travail avec la pièce courante terminé
         self.current = None
 
     def _first(self):
-		"""Initialise le jeu
-		"""
+        """Initialise le jeu
+        """
         self.plateau = [[0] * DIM_PLATEAU[0] for i in range(DIM_PLATEAU[1])]
         self.score, self.pieces, self.lignes, self.tetris, self.niveau = 0, 0, 0, 0, 1
-        self.current, self.next, self.perdu = None, self._getPiece(), False
+        self.current, self.next, self.perdu = None, self._get_piece(), False
 
     def _next(self):
-		"""Choisit la piece qui suit
-		"""
+        """Nous fait utiliser la prochaine piece
+        """
         print("Piece suivante")
-        self.current, self.next = self.next, self._getPiece()
+        self.current, self.next = self.next, self._get_piece()
         self.pieces += 1
-        self.position = [int(DIM_PLATEAU[0] / 2) - 2, -4, 0]
-        self._calculerDonneesPieceCourante()
+        self.position = [MILLIEU, -4, 0]
+        self._calculer_donnees_piece_courante()
         self.dernier_mouvement = self.derniere_chute = time.time()
 
-    def _gererEvenements(self):
-		"""Gere les evenements/touches voir prints
-		"""
-        event = self._getEvent()
+    def _gerer_evenements(self):
+        """Gere les evenements en fonction de la touche appuyée
+            (voir les prints)
+        """
+        event = self._get_event()
         if event == K_p:
             print("Pause")
             self.surface.fill(COULEURS.get(0))
-            self._afficherTexte('Pause', CENTRE_FENETRE, font='titre')
-            self._afficherTexte('Appuyer sur une touche...', POS)
+            self._afficher_texte('Pause', CENTRE_FENETRE, font='titre')
+            self._afficher_texte('Appuyer sur une touche...', POS)
             self._attente()
         elif event == K_LEFT:
             print("Mouvement vers la gauche")
-            if self._estValide(x=-1):
+            if self._est_valide(x=-1):
                 self.position[0] -= 1
         elif event == K_RIGHT:
             print("Mouvement vers la droite")
-            if self._estValide(x=1):
+            if self._est_valide(x=1):
                 self.position[0] += 1
         elif event == K_DOWN:
             print("Mouvement vers le bas")
-            if self._estValide(y=1):
+            if self._est_valide(y=1):
                 self.position[1] += 1
         elif event == K_UP:
             print("Mouvement de rotation")
-            if self._estValide(r=1):
-                self.position[2] = (self.position[2] + 1) % len(self.current)
+            if self._est_valide(r=1):
+                self.position[2] = (self.position[2] + 1) %len(self.current)
         elif event == K_SPACE:
-            print("Mouvement de chute %s / %s" %
-                  (self.position, self.coordonnees))
-            if self.position[1] <= 0:
+            print("Mouvement de chute %s / %s" % (self.position, self.coordonnees))
+            if self.position[1] <=0:
                 self.position[1] = 1
-                self._calculerDonneesPieceCourante()
+                self._calculer_donnees_piece_courante()
             a = 0
-            while self._estValide(y=a):
-                a += 1
-            self.position[1] += a - 1
-        self._calculerDonneesPieceCourante()
+            while self._est_valide(y=a):
+                a+=1
+            self.position[1] += a-1
+        self._calculer_donnees_piece_courante()
 
-    def _gererGravite(self):
-		"""Gere la chute des blocs
-		"""
+    def _gerer_gravite(self):
+        """Controle la chute des blocs
+        """
         if time.time() - self.derniere_chute > 0.35:
             self.derniere_chute = time.time()
-            if not self._estValide():
-                print("On est dans une position invalide")
+            if not self._est_valide():
+                print ("On est dans une position invalide")
                 self.position[1] -= 1
-                self._calculerDonneesPieceCourante()
-                self._poserPiece()
-            elif self._estValide() and not self._estValide(y=1):
-                self._calculerDonneesPieceCourante()
-                self._poserPiece()
+                self._calculer_donnees_piece_courante()
+                self._poser_piece()
+            elif self._est_valide() and not self._est_valide(y=1):
+                self._calculer_donnees_piece_courante()
+                self._poser_piece()
             else:
                 print("On déplace vers le bas")
                 self.position[1] += 1
-                self._calculerDonneesPieceCourante()
+                self._calculer_donnees_piece_courante()
 
-    def _dessinerPlateau(self):
-		"""Créé le plateau
-		"""
+    def _dessiner_plateau(self):
+        """Dessine le plateau du jeu
+        """
         self.surface.fill(COULEURS.get(0))
-        pygame.draw.rect(self.surface, COULEURS[8],
-                         START_PLABORD + TAILLE_PLABORD, BORDURE_PLATEAU)
+        pygame.draw.rect(self.surface, COULEURS[8], START_PLABORD+TAILLE_PLABORD, BORDURE_PLATEAU)
         for i, ligne in enumerate(self.plateau):
             for j, case in enumerate(ligne):
                 couleur = COULEURS[case]
                 position = j, i
-                coordonnees = tuple([
-                    START_PLATEAU[k] + position[k] * TAILLE_BLOC[k]
-                    for k in range(2)
-                ])
-                pygame.draw.rect(self.surface, couleur,
-                                 coordonnees + TAILLE_BLOC)
+                coordonnees = tuple([START_PLATEAU[k] + position[k] * TAILLE_BLOC[k] for k in range(2)])
+                pygame.draw.rect(self.surface, couleur, coordonnees + TAILLE_BLOC)
         if self.current is not None:
             for position in self.coordonnees:
-                couleur = COULEURS.get(self._getCurrentPieceColor())
-                coordonnees = tuple([
-                    START_PLATEAU[k] + position[k] * TAILLE_BLOC[k]
-                    for k in range(2)
-                ])
-                pygame.draw.rect(self.surface, couleur,
-                                 coordonnees + TAILLE_BLOC)
-        self.score, self.pieces, self.lignes, self.tetris, self.niveau  #TODO
-        self._afficherTexte('Score: >%s' % self.score, POSITION_SCORE)
-        self._afficherTexte('Pièces: %s' % self.pieces, POSITION_PIECES)
-        self._afficherTexte('Lignes: %s' % self.lignes, POSITION_LIGNES)
-        self._afficherTexte('Tetris: %s' % self.tetris, POSITION_TETRIS)
-        self._afficherTexte('Niveau: %s' % self.niveau, POSITION_NIVEAU)
+                couleur = COULEURS.get(self._get_current_piece_color())
+                coordonnees = tuple([START_PLATEAU[k] + position[k] * TAILLE_BLOC[k] for k in range(2)])
+                pygame.draw.rect(self.surface, couleur, coordonnees + TAILLE_BLOC)
+        self.score, self.pieces, self.lignes, self.tetris, self.niveau#TODO
+        self._afficher_texte('Score: >%s' % self.score, POSITION_SCORE)
+        self._afficher_texte('Pièces: %s' % self.pieces, POSITION_PIECES)
+        self._afficher_texte('Lignes: %s' % self.lignes, POSITION_LIGNES)
+        self._afficher_texte('Tetris: %s' % self.tetris, POSITION_TETRIS)
+        self._afficher_texte('Niveau: %s' % self.niveau, POSITION_NIVEAU)
 
         self._rendre()
 
     def play(self):
-		"""Moteur du jeu
-		"""
+        """Methode qui tourne si on 
+            Demarre le jeu depuis l'écran de titre
+            tant qu'on a pas perdu. Le moteur du jeu
+        """
         print("Jouer")
         self.surface.fill(COULEURS.get(0))
         self._first()
         while not self.perdu:
             if self.current is None:
                 self._next()
-            self._gererEvenements()
-            self._gererGravite()
-            self._dessinerPlateau()
+            self._gerer_evenements()
+            self._gerer_gravite()
+            self._dessiner_plateau()
+
 
 if __name__ == '__main__':
-		"""Gère le lancement du jeu
-		"""
+    """Gère le lancement du jeu
+    """
     j = Jeu()
     print("Jeu prêt")
     j.start()
