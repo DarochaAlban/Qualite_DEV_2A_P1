@@ -364,6 +364,8 @@ class Jeu:
 			self._dessiner_plateau()
 
     def _poserPiece(self):
+		"""Pose une piece
+		"""
         print("La pièce est posée")
         if self.position[1] <= 0:
             self.perdu = True
@@ -397,11 +399,15 @@ class Jeu:
         self.current = None
 
     def _first(self):
+		"""Initialise le jeu
+		"""
         self.plateau = [[0] * DIM_PLATEAU[0] for i in range(DIM_PLATEAU[1])]
         self.score, self.pieces, self.lignes, self.tetris, self.niveau = 0, 0, 0, 0, 1
         self.current, self.next, self.perdu = None, self._getPiece(), False
 
     def _next(self):
+		"""Choisit la piece qui suit
+		"""
         print("Piece suivante")
         self.current, self.next = self.next, self._getPiece()
         self.pieces += 1
@@ -410,6 +416,8 @@ class Jeu:
         self.dernier_mouvement = self.derniere_chute = time.time()
 
     def _gererEvenements(self):
+		"""Gere les evenements/touches voir prints
+		"""
         event = self._getEvent()
         if event == K_p:
             print("Pause")
@@ -446,6 +454,8 @@ class Jeu:
         self._calculerDonneesPieceCourante()
 
     def _gererGravite(self):
+		"""Gere la chute des blocs
+		"""
         if time.time() - self.derniere_chute > 0.35:
             self.derniere_chute = time.time()
             if not self._estValide():
@@ -462,6 +472,8 @@ class Jeu:
                 self._calculerDonneesPieceCourante()
 
     def _dessinerPlateau(self):
+		"""Créé le plateau
+		"""
         self.surface.fill(COULEURS.get(0))
         pygame.draw.rect(self.surface, COULEURS[8],
                          START_PLABORD + TAILLE_PLABORD, BORDURE_PLATEAU)
@@ -494,6 +506,8 @@ class Jeu:
         self._rendre()
 
     def play(self):
+		"""Moteur du jeu
+		"""
         print("Jouer")
         self.surface.fill(COULEURS.get(0))
         self._first()
@@ -505,6 +519,8 @@ class Jeu:
             self._dessinerPlateau()
 
 if __name__ == '__main__':
+		"""Gère le lancement du jeu
+		"""
     j = Jeu()
     print("Jeu prêt")
     j.start()
