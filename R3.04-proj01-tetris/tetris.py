@@ -15,18 +15,12 @@ __maintainer__ = "votre nom"
 __email__ = "votre email"
 
 # Probleme de l'ordre des imports
-import pygame
+
 import random
-import time
 import sys
-import constantes
-
-#^ Les pièces sont représentée dans des
-#^ liste de grilles 4x4 représentant leur formes et rotations
-#^ Il faudra retoucher ces listes pour mieux comprendre et
-#^ aérer entre les différentes rotations.
-
-
+import time
+import pygame
+from pygame.locals import *
 
 TAILLE_FENETRE = 640, 480
 DIM_PLATEAU = 10, 20
