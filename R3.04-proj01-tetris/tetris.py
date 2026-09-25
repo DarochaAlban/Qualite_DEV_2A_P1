@@ -16,12 +16,12 @@ __maintainer__ = "votre nom"
 __email__ = "votre email"
 
 # Probleme de l'ordre des imports
-from pygame.locals import *
+
 import random
+import sys
 import time
 import pygame
-import sys
-
+from pygame.locals import *
 
 TAILLE_FENETRE = 640, 480
 DIM_PLATEAU = 10, 20
